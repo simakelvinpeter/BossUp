@@ -1,1 +1,0 @@
-# Core modules - Firebase & Security
