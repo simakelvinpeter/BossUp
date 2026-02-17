@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Dashboard - BossUp EA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/variables.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <div>
+                        BossUp EA
+                        <small>Investor Portal</small>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <a href="#" class="nav-item active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="marketplace.html" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9,22 9,12 15,12 15,22"/>
+                        </svg>
+                        Marketplace
+                    </a>
+                    <a href="#" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                        </svg>
+                        My Portfolio
+                        <span class="badge">12</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        Messages
+                        <span class="badge">3</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                        Settings
+                    </a>
+                    <a href="learning.html" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                        </svg>
+                        Learning Centre
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16,17 21,12 16,7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" placeholder="Search investments, campaigns...">
+                </div>
+                <div class="header-actions">
+                    <button class="header-icon-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <div class="header-user">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="header-user-avatar">
+                    </div>
+                    <button class="logout-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16,17 21,12 16,7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Logout
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <div class="welcome-text">
+                        <h1>Welcome back, James</h1>
+                        <p>Here's what's happening with your investments today.</p>
+                    </div>
+                    <div class="welcome-meta">
+                        <span class="system-status">All Systems Operational</span>
+                        <p style="margin-top: 8px;">Last updated: 2 minutes ago</p>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-label">Total Invested</span>
+                            <div class="stat-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 1v22"/>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-card-value">KES 2.5M</div>
+                        <div class="stat-card-trend positive">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
+                                <polyline points="17,6 23,6 23,12"/>
+                            </svg>
+                            +12.5% from last month
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-label">Current ROI</span>
+                            <div class="stat-card-icon gold">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
+                                    <polyline points="17,6 23,6 23,12"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-card-value">+14.5%</div>
+                        <div class="stat-card-trend positive">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
+                                <polyline points="17,6 23,6 23,12"/>
+                            </svg>
+                            +2.3% from last month
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-label">Available Balance</span>
+                            <div class="stat-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                                    <line x1="1" y1="10" x2="23" y2="10"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-card-value">KES 450K</div>
+                        <div class="stat-card-subtitle">Ready to invest</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-label">Active Investments</span>
+                            <div class="stat-card-icon gold">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-card-value">12</div>
+                        <div class="stat-card-subtitle">3 pending payouts</div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Portfolio Growth Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                                </svg>
+                                Portfolio Growth
+                            </h3>
+                            <div class="card-action">
+                                <select style="border: none; font-size: 13px; color: var(--text-secondary); cursor: pointer;">
+                                    <option>Last 6 months</option>
+                                    <option>Last year</option>
+                                    <option>All time</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-placeholder">
+                                <svg viewBox="0 0 400 150" fill="none" preserveAspectRatio="none">
+                                    <defs>
+                                        <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#1a4d2e;stop-opacity:0.3" />
+                                            <stop offset="100%" style="stop-color:#1a4d2e;stop-opacity:0" />
+                                        </linearGradient>
+                                    </defs>
+                                    <path d="M0,120 C40,110 60,90 100,85 C140,80 160,95 200,70 C240,45 260,60 300,35 C340,10 380,20 400,15 L400,150 L0,150 Z" fill="url(#chartGradient)"/>
+                                    <path d="M0,120 C40,110 60,90 100,85 C140,80 160,95 200,70 C240,45 260,60 300,35 C340,10 380,20 400,15" stroke="#1a4d2e" stroke-width="3" fill="none"/>
+                                </svg>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 16px; font-size: 12px; color: var(--text-muted);">
+                                <span>Jul</span>
+                                <span>Aug</span>
+                                <span>Sep</span>
+                                <span>Oct</span>
+                                <span>Nov</span>
+                                <span>Dec</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Payouts -->
+                    <div class="upcoming-card">
+                        <div class="upcoming-header">
+                            <span class="upcoming-title">Upcoming Payouts</span>
+                            <div class="upcoming-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="16" y1="2" x2="16" y2="6"/>
+                                    <line x1="8" y1="2" x2="8" y2="6"/>
+                                    <line x1="3" y1="10" x2="21" y2="10"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="upcoming-item">
+                            <div class="upcoming-date">15</div>
+                            <div class="upcoming-info">
+                                <h4>GreenGrow Farms Q2 Return</h4>
+                                <p>KES 35,000 • 15th Dec 2024</p>
+                            </div>
+                        </div>
+                        <div class="upcoming-item">
+                            <div class="upcoming-date">22</div>
+                            <div class="upcoming-info">
+                                <h4>TechStartup Interest</h4>
+                                <p>KES 12,500 • 22nd Dec 2024</p>
+                            </div>
+                        </div>
+                        <div class="upcoming-item">
+                            <div class="upcoming-date">05</div>
+                            <div class="upcoming-info">
+                                <h4>Dairy Co-op Dividend</h4>
+                                <p>KES 28,000 • 5th Jan 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Investments Table -->
+                <div class="card" style="margin-top: 24px;">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                            Active Investments
+                        </h3>
+                        <a href="#" class="card-action">View All →</a>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Campaign</th>
+                                    <th>Category</th>
+                                    <th>Invested</th>
+                                    <th>Current ROI</th>
+                                    <th>Status</th>
+                                    <th>Next Payout</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="table-user">
+                                            <div class="table-user-avatar">GG</div>
+                                            <div class="table-user-info">
+                                                <div class="table-user-name">GreenGrow Poultry</div>
+                                                <div class="table-user-sub">Nairobi, Kenya</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="category-badge agriculture">Agriculture</span></td>
+                                    <td><strong>KES 250,000</strong></td>
+                                    <td style="color: var(--success-green); font-weight: 600;">+18.2%</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td>15 Dec 2024</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-user">
+                                            <div class="table-user-avatar" style="background: #db2777;">AF</div>
+                                            <div class="table-user-info">
+                                                <div class="table-user-name">African Fashion Hub</div>
+                                                <div class="table-user-sub">Dar es Salaam, Tanzania</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="category-badge fashion">Fashion</span></td>
+                                    <td><strong>KES 180,000</strong></td>
+                                    <td style="color: var(--success-green); font-weight: 600;">+12.5%</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td>22 Dec 2024</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-user">
+                                            <div class="table-user-avatar" style="background: #2563eb;">EA</div>
+                                            <div class="table-user-info">
+                                                <div class="table-user-name">EduAccess Rwanda</div>
+                                                <div class="table-user-sub">Kigali, Rwanda</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="category-badge education">Education</span></td>
+                                    <td><strong>KES 320,000</strong></td>
+                                    <td style="color: var(--success-green); font-weight: 600;">+15.0%</td>
+                                    <td><span class="badge badge-warning">Pending</span></td>
+                                    <td>5 Jan 2025</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-user">
+                                            <div class="table-user-avatar" style="background: #7c3aed;">TT</div>
+                                            <div class="table-user-info">
+                                                <div class="table-user-name">TechTalent Uganda</div>
+                                                <div class="table-user-sub">Kampala, Uganda</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="category-badge tech">Technology</span></td>
+                                    <td><strong>KES 150,000</strong></td>
+                                    <td style="color: var(--success-green); font-weight: 600;">+22.0%</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td>10 Jan 2025</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

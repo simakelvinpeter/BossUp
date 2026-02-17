@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Centre - BossUp EA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/variables.css">
+    <link rel="stylesheet" href="assets/css/learning.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="index.html" class="logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <span>BossUp <small>EA</small></span>
+                </a>
+                <div class="nav-links">
+                    <a href="marketplace.html">Opportunities</a>
+                    <a href="index.html#how-it-works">How It Works</a>
+                    <a href="index.html#success-stories">Success Stories</a>
+                    <a href="learning.html" class="active">Learning</a>
+                </div>
+                <div class="nav-actions">
+                    <a href="login.html" class="btn btn-outline">Sign In</a>
+                    <a href="signup.html" class="btn btn-primary">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Learning Hero -->
+    <section class="learning-hero">
+        <div class="container">
+            <div class="learning-hero-content">
+                <h1>Learning Centre</h1>
+                <p>Grow your investment knowledge with expert-led courses, masterclasses, and resources tailored for the East African market.</p>
+                <div class="learning-search">
+                    <input type="text" placeholder="Search courses, articles, mentors...">
+                    <button class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Filters -->
+    <div class="container">
+        <div class="learning-categories">
+            <div class="category-tabs">
+                <button class="category-tab active">All Topics</button>
+                <button class="category-tab">Investment Basics</button>
+                <button class="category-tab">Agriculture</button>
+                <button class="category-tab">Technology</button>
+                <button class="category-tab">Financial Literacy</button>
+                <button class="category-tab">Business Strategy</button>
+                <button class="category-tab">Due Diligence</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Continue Learning -->
+        <div class="continue-card">
+            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400" alt="Course" class="continue-card-image">
+            <div class="continue-card-content">
+                <span class="continue-card-badge">Continue Learning</span>
+                <h3>Fundamentals of Investment Analysis</h3>
+                <p>Learn how to evaluate investment opportunities, understand financial statements, and make data-driven decisions.</p>
+                <div class="continue-progress">
+                    <div class="continue-progress-label">
+                        <span>Module 4 of 8</span>
+                        <span>50% Complete</span>
+                    </div>
+                    <div class="continue-progress-bar">
+                        <div class="continue-progress-fill" style="width: 50%;"></div>
+                    </div>
+                </div>
+                <button class="btn">Resume Course →</button>
+            </div>
+        </div>
+
+        <!-- Popular Masterclasses -->
+        <div class="section-header">
+            <h2 class="section-title">Popular Masterclasses</h2>
+            <a href="#" class="section-link">View All →</a>
+        </div>
+
+        <div class="masterclass-grid">
+            <!-- Masterclass 1 -->
+            <div class="masterclass-card">
+                <div class="masterclass-image">
+                    <img src="https://images.unsplash.com/photo-1560493676-04071c5f467b?w=400" alt="Agriculture">
+                    <span class="masterclass-duration">2h 30m</span>
+                    <span class="masterclass-badge">Bestseller</span>
+                </div>
+                <div class="masterclass-content">
+                    <div class="masterclass-category">Agriculture</div>
+                    <h3 class="masterclass-title">Investing in East African Agriculture: A Complete Guide</h3>
+                    <div class="masterclass-instructor">
+                        <img src="https://randomuser.me/api/portraits/men/52.jpg" alt="Instructor">
+                        <div class="masterclass-instructor-info">
+                            <div class="masterclass-instructor-name">Dr. Joseph Kamau</div>
+                            <div class="masterclass-instructor-role">Agribusiness Expert</div>
+                        </div>
+                    </div>
+                    <div class="masterclass-meta">
+                        <div class="masterclass-rating">
+                            <svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+                            4.9 (1,234)
+                        </div>
+                        <div class="masterclass-price">KES 2,500</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Masterclass 2 -->
+            <div class="masterclass-card">
+                <div class="masterclass-image">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400" alt="Finance">
+                    <span class="masterclass-duration">1h 45m</span>
+                </div>
+                <div class="masterclass-content">
+                    <div class="masterclass-category">Financial Literacy</div>
+                    <h3 class="masterclass-title">Understanding Risk & Return in Crowdfunding Investments</h3>
+                    <div class="masterclass-instructor">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Instructor">
+                        <div class="masterclass-instructor-info">
+                            <div class="masterclass-instructor-name">Sarah Wanjiru</div>
+                            <div class="masterclass-instructor-role">Financial Analyst</div>
+                        </div>
+                    </div>
+                    <div class="masterclass-meta">
+                        <div class="masterclass-rating">
+                            <svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+                            4.8 (892)
+                        </div>
+                        <div class="masterclass-price free">FREE</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Masterclass 3 -->
+            <div class="masterclass-card">
+                <div class="masterclass-image">
+                    <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400" alt="Technology">
+                    <span class="masterclass-duration">3h 15m</span>
+                    <span class="masterclass-badge">New</span>
+                </div>
+                <div class="masterclass-content">
+                    <div class="masterclass-category">Technology</div>
+                    <h3 class="masterclass-title">Evaluating Tech Startups in Africa: Due Diligence 101</h3>
+                    <div class="masterclass-instructor">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Instructor">
+                        <div class="masterclass-instructor-info">
+                            <div class="masterclass-instructor-name">James Ochieng</div>
+                            <div class="masterclass-instructor-role">Venture Capitalist</div>
+                        </div>
+                    </div>
+                    <div class="masterclass-meta">
+                        <div class="masterclass-rating">
+                            <svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+                            4.7 (456)
+                        </div>
+                        <div class="masterclass-price">KES 3,500</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Articles -->
+        <div class="section-header">
+            <h2 class="section-title">Latest Articles</h2>
+            <a href="#" class="section-link">View All →</a>
+        </div>
+
+        <div class="articles-grid">
+            <!-- Article 1 -->
+            <article class="article-card">
+                <div class="article-image">
+                    <img src="https://images.unsplash.com/photo-1591696205602-2f950c417cb9?w=300" alt="Article">
+                </div>
+                <div class="article-content">
+                    <div class="article-category">Investment Tips</div>
+                    <h3 class="article-title">5 Red Flags to Watch When Investing in SMEs</h3>
+                    <div class="article-meta">
+                        <span>5 min read</span>
+                        <span>Dec 5, 2024</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Article 2 -->
+            <article class="article-card">
+                <div class="article-image">
+                    <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=300" alt="Article">
+                </div>
+                <div class="article-content">
+                    <div class="article-category">Agriculture</div>
+                    <h3 class="article-title">The Rise of Agri-Tech in East Africa</h3>
+                    <div class="article-meta">
+                        <span>8 min read</span>
+                        <span>Dec 3, 2024</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Article 3 -->
+            <article class="article-card">
+                <div class="article-image">
+                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=300" alt="Article">
+                </div>
+                <div class="article-content">
+                    <div class="article-category">Financial Literacy</div>
+                    <h3 class="article-title">Building a Diversified Investment Portfolio</h3>
+                    <div class="article-meta">
+                        <span>6 min read</span>
+                        <span>Dec 1, 2024</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Article 4 -->
+            <article class="article-card">
+                <div class="article-image">
+                    <img src="https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=300" alt="Article">
+                </div>
+                <div class="article-content">
+                    <div class="article-category">Success Stories</div>
+                    <h3 class="article-title">How M-PESA Transformed Investment Access</h3>
+                    <div class="article-meta">
+                        <span>7 min read</span>
+                        <span>Nov 28, 2024</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <!-- Mentors Section -->
+    <section class="mentors-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Learn from the Best</h2>
+                <a href="#" class="section-link">View All Mentors →</a>
+            </div>
+
+            <div class="mentors-grid">
+                <!-- Mentor 1 -->
+                <div class="mentor-card">
+                    <img src="https://randomuser.me/api/portraits/men/52.jpg" alt="Dr. Joseph Kamau" class="mentor-avatar">
+                    <h3 class="mentor-name">Dr. Joseph Kamau</h3>
+                    <p class="mentor-role">Agribusiness Expert • Kenya</p>
+                    <div class="mentor-expertise">
+                        <span class="mentor-tag">Agriculture</span>
+                        <span class="mentor-tag">Investment</span>
+                        <span class="mentor-tag">Strategy</span>
+                    </div>
+                    <div class="mentor-stats">
+                        <div class="mentor-stat">
+                            <div class="mentor-stat-value">15+</div>
+                            <div class="mentor-stat-label">Years Exp</div>
+                        </div>
+                        <div class="mentor-stat">
+                            <div class="mentor-stat-value">2.4K</div>
+                            <div class="mentor-stat-label">Students</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline mentor-btn">Book Session</button>
+                </div>
+
+                <!-- Mentor 2 -->
+                <div class="mentor-card">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah Wanjiru" class="mentor-avatar">
+                    <h3 class="mentor-name">Sarah Wanjiru</h3>
+                    <p class="mentor-role">Financial Analyst • Kenya</p>
+                    <div class="mentor-expertise">
+                        <span class="mentor-tag">Finance</span>
+                        <span class="mentor-tag">Risk Analysis</span>
+                    </div>
+                    <div class="mentor-stats">
+                        <div class="mentor-stat">
+                            <div class="mentor-stat-value">10+</div>
+                            <div class="mentor-stat-label">Years Exp</div>
+                        </div>
+                        <div class="mentor-stat">
+                            <div class="mentor-stat-value">1.8K</div>
+                            <div class="mentor-stat-label">Students</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline mentor-btn">Book Session</button>
+                </div>
+
+                <!-- Mentor 3 -->
+                <div class="mentor-card">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="James Ochieng" class="mentor-avatar">
+                    <h3 class="mentor-name">James Ochieng</h3>
+                    <p class="mentor-role">Venture Capitalist • Uganda</p>
+                    <div class="mentor-expertise">
+                        <span class="mentor-tag">Tech Startups</span>
+                        <span class="mentor-tag">Due Diligence</span>
+                    </div>
+                    <div class="mentor-stats">
+                        <div class="mentor-stat">
+                            <div class="mentor-stat-value">12+</div>
+                            <div class="mentor-stat-label">Years Exp</div>
+                        </div>
+                        <div class="mentor-stat">
+                            <div class="mentor-stat-value">980</div>
+                            <div class="mentor-stat-label">Students</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline mentor-btn">Book Session</button>
+                </div>
+
+                <!-- Mentor 4 -->
+                <div class="mentor-card">
+                    <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Grace Nakato" class="mentor-avatar">
+                    <h3 class="mentor-name">Grace Nakato</h3>
+                    <p class="mentor-role">Business Strategist • Rwanda</p>
+                    <div class="mentor-expertise">
+                        <span class="mentor-tag">Business Growth</span>
+                        <span class="mentor-tag">SME Finance</span>
+                    </div>
+                    <div class="mentor-stats">
+                        <div class="mentor-stat">
+                            <div class="mentor-stat-value">8+</div>
+                            <div class="mentor-stat-label">Years Exp</div>
+                        </div>
+                        <div class="mentor-stat">
+                            <div class="mentor-stat-value">650</div>
+                            <div class="mentor-stat-label">Students</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline mentor-btn">Book Session</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                        <span>BossUp <small>EA</small></span>
+                    </a>
+                    <p>Empowering African youth entrepreneurs through accessible crowdfunding and investor education.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Platform</h4>
+                    <a href="marketplace.html">Opportunities</a>
+                    <a href="learning.html">Learning Centre</a>
+                    <a href="#">How It Works</a>
+                    <a href="#">Success Stories</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <a href="#">About Us</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Press</a>
+                    <a href="#">Contact</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Risk Disclosure</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 BossUp East Africa. All rights reserved.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Facebook">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="Twitter">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="LinkedIn">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
