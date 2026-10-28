@@ -26,6 +26,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (_) {
     localStorage.removeItem("bossup_campaign_draft");
   }
+  const currencyField = document.getElementById("currency");
+  const amountField = document.getElementById("amountNeeded");
+  const updateAmountStep = () => {
+    amountField.step = currencyField.value === "BIF" ? "1" : "0.01";
+  };
+  currencyField.addEventListener("change", updateAmountStep);
+  document.getElementById("country").addEventListener("change", (event) => {
+    currencyField.value = {
+      BI: "BIF",
+      TZ: "TZS",
+      KE: "KES",
+      UG: "UGX",
+      RW: "RWF",
+    }[event.target.value];
+    updateAmountStep();
+  });
+  updateAmountStep();
   document.getElementById("save-draft")?.addEventListener("click", () => {
     const draft = Object.fromEntries(
       draftFields.map((id) => [id, document.getElementById(id).value]),

@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Create Campaign - BossUp East Africa</title>
+    <title>Create Campaign - BossUp Burundi &amp; East Africa</title>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link
@@ -830,6 +830,7 @@
         }
       }
     </style>
+    <link href="assets/css/i18n.css" rel="stylesheet" />
   </head>
   <body>
     <!-- Auth Gate -->
@@ -879,7 +880,7 @@
               />
             </div>
             <div class="user-info">
-              <h3>BossUp East Africa</h3>
+              <h3>BossUp Burundi &amp; East Africa</h3>
               <p>Entrepreneur Dashboard</p>
             </div>
           </div>
@@ -974,7 +975,7 @@
               <span>💡</span>
               <span>PRO TIP</span>
             </div>
-            <p>Detailed risk analysis increases donor trust by 40%.</p>
+            <p>A clear campaign story helps donors understand your project.</p>
           </div>
         </div>
       </aside>
@@ -1270,18 +1271,20 @@
                   <div class="form-group">
                     <label class="form-label">Currency</label
                     ><select class="form-select" id="currency" required="">
+                      <option selected="" value="BIF">BIF</option>
                       <option value="KES">KES</option>
                       <option value="UGX">UGX</option>
-                      <option selected="" value="TZS">TZS</option>
+                      <option value="TZS">TZS</option>
                       <option value="RWF">RWF</option>
                     </select>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Country</label
                     ><select class="form-select" id="country" required="">
+                      <option selected="" value="BI">Burundi</option>
                       <option value="KE">Kenya</option>
                       <option value="UG">Uganda</option>
-                      <option selected="" value="TZ">Tanzania</option>
+                      <option value="TZ">Tanzania</option>
                       <option value="RW">Rwanda</option>
                     </select>
                   </div>
@@ -1345,6 +1348,7 @@
       </main>
     </div>
     <!-- Firebase SDK -->
+    <script src="assets/js/i18n.js"></script>
     <script src="assets/js/api.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/create-campaign.js"></script>

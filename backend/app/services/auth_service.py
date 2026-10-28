@@ -11,10 +11,10 @@ Security:
 
 from datetime import datetime
 from typing import Optional
-from typing import Literal
 import os
 import httpx
 from pydantic import BaseModel, EmailStr, Field, field_validator
+from app.core.markets import Country
 
 from firebase_admin import auth as firebase_auth
 from firebase_admin.exceptions import FirebaseError
@@ -40,7 +40,7 @@ class SignupRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
     role: UserRole
-    country: Literal["KE", "UG", "TZ", "RW"]
+    country: Country
     full_name: Optional[str] = None
 
     @field_validator("role")

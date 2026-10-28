@@ -128,6 +128,7 @@ try:
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.route("**/*", api)
         page.goto(base + "/login.html")
+        assert page.locator("#language-choice").input_value() == "en"
         page.locator("#email").fill("person@example.com")
         page.locator("#password").fill("correct-password")
         page.locator("#submitBtn").click()
@@ -175,10 +176,41 @@ try:
         page.get_by_role("heading", level=1).wait_for()
         page.goto(base + "/learning.html")
         page.locator("summary").first.click()
+        page.locator("#language-choice").select_option("fr")
+        page.get_by_text("Soutenir une campagne", exact=True).wait_for()
+        assert page.locator("html").get_attribute("lang") == "fr"
+        page.reload()
+        assert page.locator("#language-choice").input_value() == "fr"
+        page.locator("#language-choice").select_option("rn")
+        page.get_by_text("Gushigikira umugambi", exact=True).wait_for()
+        assert page.locator("html").get_attribute("lang") == "rn"
+        campaign.update(country="BI", currency="BIF", title="Home")
+        page.goto(base + "/marketplace.html")
+        page.locator('[data-country="burundi"]').click()
+        page.locator(".view-campaign-btn").click()
+        page.locator(".campaign-main h1").get_by_text("Home", exact=True).wait_for()
+        assert page.locator("#donation-form button").is_disabled()
+        assert page.locator("#donation-currency").inner_text() == "BIF"
+        assert page.locator("#donation-message").inner_text()
+        state["role"] = "BUSINESS_OWNER"
+        page.goto(base + "/create-campaign.html")
+        page.locator("#mainApp").wait_for(state="visible")
+        assert page.locator("#country").input_value() == "BI"
+        assert page.locator("#currency").input_value() == "BIF"
+        assert page.locator("#amountNeeded").get_attribute("step") == "1"
+        page.locator("#ventureName").fill("Burundi project draft")
+        page.locator("#language-choice").select_option("fr")
+        assert page.locator("#ventureName").input_value() == "Burundi project draft"
+        if os.getenv("SCREENSHOT_DIR"):
+            output = Path(os.environ["SCREENSHOT_DIR"])
+            output.mkdir(parents=True, exist_ok=True)
+            page.screenshot(path=str(output / "bossup-burundi-french.png"), full_page=True)
+        page.locator("#language-choice").select_option("en")
+        assert "28" in page.evaluate("formatLocalDate('2026-10-28T21:30:00Z')")
         assert not errors, errors
         browser.close()
         print(
-            "Browser contracts passed: login, signup, dashboards, draft, submission, review and disabled checkout."
+            "Browser contracts passed: account and campaign flows, Burundi/BIF, French/Kirundi persistence, form preservation and disabled local checkout."
         )
 finally:
     server.shutdown()

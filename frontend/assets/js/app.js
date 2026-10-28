@@ -31,10 +31,17 @@ async function requireUser(role) {
 function signOut() {
   return API.logout();
 }
-function formatCurrency(amount, currency = "KES") {
-  return new Intl.NumberFormat("en-KE", { style: "currency", currency }).format(
-    amount,
-  );
+function formatCurrency(amount, currency = "BIF") {
+  return new Intl.NumberFormat(BossUpI18n.locale, {
+    style: "currency",
+    currency,
+  }).format(amount);
+}
+function formatLocalDate(value) {
+  return new Intl.DateTimeFormat(BossUpI18n.locale, {
+    dateStyle: "medium",
+    timeZone: "Africa/Bujumbura",
+  }).format(new Date(value));
 }
 function escapeHtml(value) {
   const element = document.createElement("span");
@@ -90,3 +97,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   });
 });
+
+function countryName(code) {
+  return BossUpI18n.text(
+    { BI: "Burundi", TZ: "Tanzania", KE: "Kenya", UG: "Uganda", RW: "Rwanda" }[
+      code
+    ] || code,
+  );
+}

@@ -48,7 +48,7 @@ async function loadDashboard() {
         (donation) => `<tr>
       <td><a href="campaign.html?id=${encodeURIComponent(donation.campaign_id)}">${escapeHtml(donation.campaign_id)}</a></td>
       <td>${formatCurrency(donation.amount, donation.currency)}</td><td>${escapeHtml(donation.status)}</td>
-      <td>${escapeHtml(new Date(donation.created_at).toLocaleDateString())}</td></tr>`,
+      <td>${escapeHtml(formatLocalDate(donation.created_at))}</td></tr>`,
       ),
     );
   } else if (role === "BUSINESS_OWNER") {
@@ -105,7 +105,7 @@ async function loadDashboard() {
       ["Action", "User", "Time"],
       audit.map(
         (item) => `<tr>
-      <td>${escapeHtml(item.action)}</td><td>${escapeHtml(item.user_id)}</td><td>${escapeHtml(item.timestamp)}</td></tr>`,
+      <td>${escapeHtml(item.action)}</td><td>${escapeHtml(item.user_id)}</td><td>${escapeHtml(formatLocalDate(item.timestamp))}</td></tr>`,
       ),
     );
     document.getElementById("dashboard-message").textContent =
@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("dashboard-title").textContent =
     role === "ADMIN"
       ? "Admin dashboard"
-      : `Welcome, ${user.full_name || user.email}`;
+      : `${BossUpI18n.text("Welcome")}, ${user.full_name || user.email}`;
   try {
     await loadDashboard();
   } catch (error) {
@@ -167,4 +167,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         select.disabled = false;
       }
     });
+});
+
+document.addEventListener("bossup-language-change", async () => {
+  if (!BossUp.user) return;
+  document.getElementById("dashboard-title").textContent =
+    BossUp.user.role === "ADMIN"
+      ? BossUpI18n.text("Admin dashboard")
+      : `${BossUpI18n.text("Welcome")}, ${BossUp.user.full_name || BossUp.user.email}`;
+  try {
+    await loadDashboard();
+  } catch (error) {
+    showNotification(error.message);
+  }
 });

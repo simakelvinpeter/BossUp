@@ -12,8 +12,8 @@ Security:
 from datetime import datetime
 from typing import List, Optional
 from enum import Enum
-from pydantic import BaseModel, Field
-from typing import Literal
+from pydantic import BaseModel, Field, model_validator
+from app.core.markets import Country, Currency, validate_amount
 
 from app.core.firebase import campaigns_collection, users_collection
 from app.core.security import log_audit_event
@@ -39,12 +39,17 @@ class CreateCampaignRequest(BaseModel):
 
     title: str = Field(min_length=3, max_length=150)
     description: str = Field(min_length=50, max_length=10000)
-    country: Literal["KE", "UG", "TZ", "RW"]
+    country: Country
     target_amount: float = Field(gt=0, le=100000000, allow_inf_nan=False)
-    currency: Literal["KES", "UGX", "TZS", "RWF"] = "TZS"
+    currency: Currency = "BIF"
     category: Optional[str] = None
     image_url: Optional[str] = None
     business_plan_url: Optional[str] = None
+
+    @model_validator(mode="after")
+    def valid_currency_amount(self):
+        validate_amount(self.target_amount, self.currency)
+        return self
 
 
 class UpdateCampaignRequest(BaseModel):
@@ -206,6 +211,7 @@ class CampaignService:
         if request.description:
             update_data["description"] = request.description
         if request.target_amount:
+            validate_amount(request.target_amount, data.get("currency", "KES"))
             update_data["target_amount"] = request.target_amount
         if request.category:
             update_data["category"] = request.category

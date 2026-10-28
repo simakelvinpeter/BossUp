@@ -36,6 +36,14 @@ class FlutterwaveGateway:
     def __init__(self, client=None):
         self.client = client
 
+    @staticmethod
+    def ensure_currency_supported(currency):
+        if currency not in PAYMENT_OPTIONS:
+            raise ValueError(
+                "BIF checkout is not available yet. A Burundi payment provider "
+                "must be connected before donations can be collected."
+            )
+
     async def request(self, method, path, **kwargs):
         key = os.getenv("FLW_SECRET_KEY", "")
         if not key or os.getenv("PAYMENTS_ENABLED", "false").lower() != "true":
@@ -55,6 +63,7 @@ class FlutterwaveGateway:
         return payload["data"]
 
     async def create_session(self, amount, currency, reference, email):
+        self.ensure_currency_supported(currency)
         redirect = os.getenv("PAYMENT_RETURN_URL", "")
         if urlparse(redirect).scheme != "https":
             raise ValueError("Configure an HTTPS PAYMENT_RETURN_URL")

@@ -1,4 +1,10 @@
-const countries = { kenya: "KE", uganda: "UG", tanzania: "TZ", rwanda: "RW" };
+const countries = {
+  burundi: "BI",
+  kenya: "KE",
+  uganda: "UG",
+  tanzania: "TZ",
+  rwanda: "RW",
+};
 let campaigns = [];
 let selectedCountry = "";
 
@@ -10,7 +16,7 @@ function campaignCard(campaign) {
   const image = safeImage(campaign.image_url);
   return `<div class="campaign-card">
     <div class="campaign-image">${image ? `<img src="${escapeHtml(image)}" alt="">` : '<div style="height:180px;background:#1a4d2e"></div>'}
-      <span class="campaign-location">${escapeHtml(campaign.country)}</span>
+      <span class="campaign-location">${escapeHtml(countryName(campaign.country))}</span>
     </div>
     <div class="campaign-content">
       <h3 class="campaign-title">${escapeHtml(campaign.title)}</h3>
@@ -82,3 +88,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("campaignsGrid").textContent = error.message;
   }
 });
+
+document.addEventListener("bossup-language-change", renderCampaigns);

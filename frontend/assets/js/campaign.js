@@ -12,7 +12,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       campaign.description;
     document.querySelector(".tag-category").textContent =
       campaign.category || "General";
-    document.querySelector(".tag-location").textContent = campaign.country;
+    document.querySelector(".tag-location").textContent = countryName(
+      campaign.country,
+    );
     document.querySelector(".tag-verified").textContent =
       campaign.status === "LIVE" ? "Administrator reviewed" : campaign.status;
     document.querySelector(".invest-raised").textContent = formatCurrency(
@@ -40,6 +42,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (campaign.status !== "LIVE") {
       form.querySelector("button").disabled = true;
       message.textContent = "This campaign is not accepting donations.";
+    } else if (campaign.currency === "BIF") {
+      document.getElementById("donation-amount").step = "1";
+      form.querySelector("button").disabled = true;
+      message.textContent =
+        "BIF donations will open once a Burundi payment provider is connected. No money can be collected yet.";
     }
   } catch (error) {
     document.querySelector(".campaign-main h1").textContent =

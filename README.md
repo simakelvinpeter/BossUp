@@ -1,12 +1,12 @@
 # BossUp — East African campaign donations
 
-BossUp helps people support administrator-reviewed business campaigns through donations. Tanzania is the launch country, and new campaigns default to TZS. Donations do not buy shares, interest, ownership or promised financial returns.
+BossUp helps people support administrator-reviewed business campaigns through donations. The client market is Burundi. New accounts default to Burundi (BI), and new campaigns default to Burundian francs (BIF). Tanzania, Kenya, Uganda and Rwanda remain available; existing records keep their original currency. Donations do not buy shares, interest, ownership or promised financial returns.
 
 ## Current status
 
 The application connects signup, password login, campaign drafts/submission, administrator review, donor receipts and hosted checkout. Backend tests cover password rejection, blocked administrator signup, receipt validation, repeated payment confirmation and secure session cookies. Browser tests use explicit API fixtures; they do not prove a live Firebase or merchant integration.
 
-**Live launch is not yet verified.** Configure your Firebase project and approved Tanzanian Flutterwave merchant account, complete the sandbox acceptance steps below, and verify deployment before accepting real donations. Payments remain disabled by default. Campaign disbursements and refunds require manual operator review through the payment provider; there is no automatic wallet withdrawal or owner payout system.
+**Live launch is not yet verified.** Configure your Firebase project, select and obtain approval from a provider that supports the client’s registration country and currency, complete sandbox acceptance, and verify deployment before accepting real donations. Payments remain disabled by default. Campaign disbursements and refunds require manual operator review through the payment provider; there is no automatic wallet withdrawal or owner payout system.
 
 ## Run locally
 
@@ -46,11 +46,21 @@ python tools/promote_admin.py your-email@example.com
 
 Sign in with that account's existing password. Public signup cannot grant administrator access. Administrators verify owners, approve/reject campaigns and review audit logs. Verification is a manual check, not an automated identity-verification service.
 
-## Flutterwave for Tanzania
+## Burundi language and payment setup
+
+English remains the default interface. The language selector offers Français and Ikirundi, remembers the choice in this browser, and changes labels without reloading or clearing an unfinished form. Campaign titles, stories, names and other user content are not machine-translated. Display dates use Africa/Bujumbura; BIF amounts use whole francs. Existing records are not converted to another currency.
+
+Translations live in frontend/assets/js/i18n.js as English/French/Kirundi phrase triples. New unmapped text falls back to English. The Kirundi copy is a working translation: have the Burundian client review the terminology before public launch, especially donation and payment wording.
+
+The client currently has no business payment account. BIF campaign creation is available, but BIF checkout is explicitly unavailable: no provider request or pending transaction is created. Do not send BIF to Flutterwave or pretend another currency is equivalent. The existing Flutterwave adapter is retained for its supported East African currencies.
+
+Choose the Burundian provider only after confirming merchant eligibility, campaign-donation acceptance, API access, settlement and refunds. The [Burundi central bank’s published payment-establishment list](https://www.brb.bi/en/node/2928/revisions/3149/view) lists local operators including Lumicash and EcoCash, and an aggregator named Leapea. This is a starting point for client onboarding, not a claim that BossUp already integrates these services.
+
+## Existing Flutterwave integration
 
 The integration uses Flutterwave v3 hosted checkout. TZS offers card and mobilemoneytanzania; the code also supports KES/M-Pesa, UGX/mobilemoneyuganda and RWF/mobilemoneyrwanda when enabled for your merchant account. Provider availability and merchant approval must be confirmed for your business model and registration country.
 
-1. Complete merchant onboarding for the Tanzanian business and obtain approval to collect campaign donations. Confirm settlement/disbursement arrangements for campaign owners.
+1. Complete merchant onboarding in the actual business registration country and obtain approval to collect campaign donations. Confirm settlement/disbursement arrangements for campaign owners.
 2. Start with a test-mode FLW_SECRET_KEY in the backend environment.
 3. Set an HTTPS PAYMENT_RETURN_URL ending in /payment-complete.html on your deployment.
 4. Set a random FLW_SECRET_HASH and configure that same value in the Flutterwave v3 webhook settings. The webhook URL is https://your-domain/payments/webhook. Enable webhook retries.
@@ -90,6 +100,8 @@ On this Windows workstation, set BROWSER_CHANNEL=msedge to use installed Edge in
 
 ## Code map
 
+- frontend/assets/js/i18n.js: language selector and editable English/French/Kirundi phrases.
+- backend/app/core/markets.py: supported campaign countries/currencies and whole-franc validation.
 - frontend/assets/js/api.js: calls the same-origin API; it does not store login tokens.
 - frontend/assets/js/app.js: shared display helpers and current user.
 - account.js, marketplace.js, campaign.js, create-campaign.js, dashboard.js and receipt.js: one small file per page flow.

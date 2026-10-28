@@ -5,7 +5,8 @@ from decimal import Decimal
 from typing import Optional
 from enum import Enum
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, model_validator
+from app.core.markets import Currency, validate_amount
 from firebase_admin import firestore
 
 from app.core.firebase import (
@@ -16,7 +17,6 @@ from app.core.firebase import (
 )
 from app.services.flutterwave import (
     FlutterwaveGateway,
-    PAYMENT_OPTIONS,
     validate_receipt,
 )
 
@@ -42,18 +42,16 @@ class PaymentMethod(str, Enum):
 class InitiatePaymentRequest(BaseModel):
     campaign_id: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_-]+$")
     amount: Decimal = Field(gt=0, le=100000000, max_digits=12, decimal_places=2)
-    currency: str = "TZS"
+    currency: Currency = "BIF"
     payment_method: PaymentMethod = PaymentMethod.CARD
     return_url: Optional[str] = (
         None  # Legacy input; the server uses its configured URL.
     )
 
-    @field_validator("currency")
-    @classmethod
-    def supported_currency(cls, value):
-        if value not in PAYMENT_OPTIONS:
-            raise ValueError("Choose KES, UGX, TZS or RWF")
-        return value
+    @model_validator(mode="after")
+    def valid_currency_amount(self):
+        validate_amount(self.amount, self.currency)
+        return self
 
 
 class PaymentSessionResponse(BaseModel):
@@ -90,6 +88,8 @@ class PaymentService:
         self.gateway = gateway or FlutterwaveGateway()
 
     async def initiate_payment(self, user_id, request):
+        if isinstance(self.gateway, FlutterwaveGateway):
+            self.gateway.ensure_currency_supported(request.currency)
         campaign = campaigns_collection().document(request.campaign_id).get()
         if not campaign.exists or campaign.to_dict().get("status") != "LIVE":
             raise ValueError("This campaign is not accepting donations")

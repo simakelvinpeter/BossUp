@@ -13,6 +13,7 @@
     />
     <link href="assets/css/variables.css" rel="stylesheet" />
     <link href="assets/css/auth.css" rel="stylesheet" />
+    <link href="assets/css/i18n.css" rel="stylesheet" />
   </head>
   <body class="auth-page">
     <div class="auth-container">
@@ -71,7 +72,7 @@
               </div>
               <div class="auth-feature-text">
                 <h4>Easy Payments</h4>
-                <p>M-Pesa, cards, and bank transfers</p>
+                <p>Payment options depend on the connected provider</p>
               </div>
             </div>
             <div class="auth-feature">
@@ -88,7 +89,7 @@
                 </svg>
               </div>
               <div class="auth-feature-text">
-                <h4>$2.5M+ Raised</h4>
+                <h4>Campaign donations</h4>
                 <p>Funding youth-led businesses across EA</p>
               </div>
             </div>
@@ -184,7 +185,7 @@
                 />
                 <button
                   class="toggle-password"
-                  data-toggle-password
+                  data-toggle-password=""
                   type="button"
                 >
                   <svg
@@ -265,9 +266,10 @@
             <div class="form-group">
               <label for="country">Country</label
               ><select id="country" name="country" required="">
+                <option selected="" value="BI">Burundi</option>
                 <option value="KE">Kenya</option>
                 <option value="UG">Uganda</option>
-                <option selected="" value="TZ">Tanzania</option>
+                <option value="TZ">Tanzania</option>
                 <option value="RW">Rwanda</option>
               </select>
             </div>
@@ -295,6 +297,7 @@
       </div>
     </div>
     <!-- Firebase SDK -->
+    <script src="assets/js/i18n.js"></script>
     <script src="assets/js/api.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/account.js"></script>
