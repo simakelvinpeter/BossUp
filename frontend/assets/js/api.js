@@ -1,4 +1,3 @@
-/* All requests go to the backend served on this same origin. */
 const API = {
   async request(path, options = {}) {
     const response = await fetch(path, {

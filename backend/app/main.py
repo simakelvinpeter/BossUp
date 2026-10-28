@@ -1,14 +1,4 @@
-"""
-BossUp Backend - FastAPI Application
-=====================================
-Production-ready MVP with Firebase + FastAPI architecture.
-
-Security Architecture:
-- Firebase Admin SDK (backend-only)
-- Custom JWT issued by backend
-- Role-based access control enforced here
-- NO direct Firebase access from frontend
-"""
+"""Serve the BossUp API and frontend."""
 
 import os
 import time
@@ -26,11 +16,9 @@ from app.routers import auth, campaigns, payments, admin
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan - initialize services on startup."""
-    # Initialize Firebase Admin SDK
     initialize_firebase()
     print("✅ Firebase Admin SDK initialized")
     yield
-    # Cleanup on shutdown
     print("🔄 Shutting down BossUp backend...")
 
 
@@ -41,7 +29,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS Configuration - Adjust origins for production
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -52,7 +39,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API Routers
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(campaigns.router, prefix="/campaigns", tags=["Campaigns"])
 app.include_router(payments.router, prefix="/payments", tags=["Payments"])

@@ -1,15 +1,4 @@
-"""
-Campaigns Router
-=================
-Campaign CRUD and marketplace endpoints.
-
-Endpoints:
-- GET /campaigns - List campaigns (marketplace)
-- GET /campaigns/{id} - Get single campaign
-- POST /campaigns - Create campaign (Business Owner)
-- PUT /campaigns/{id} - Update campaign (Owner only)
-- GET /campaigns/my - Get owner's campaigns
-"""
+"""Campaign listing and owner management routes."""
 
 from typing import Optional
 from fastapi import Request
@@ -43,12 +32,7 @@ async def list_campaigns(
     country: Optional[str] = Query(None, description="Filter by country"),
     limit: int = Query(50, ge=1, le=100, description="Max results"),
 ):
-    """
-    List campaigns (public marketplace).
-
-    Default: Only LIVE campaigns shown.
-    Optionally filter by country.
-    """
+    """List campaigns (public marketplace)."""
     if status != CampaignStatus.LIVE:
         raise HTTPException(400, "The marketplace shows live campaigns only")
     try:
@@ -72,7 +56,7 @@ async def get_my_campaigns(user: CurrentUser = Depends(require_business_owner)):
     """
     try:
         campaigns = await campaign_service.list_campaigns(
-            owner_id=user.user_id, status=None  # Show all statuses for owner
+            owner_id=user.user_id, status=None
         )
         return campaigns
     except Exception as e:
@@ -111,12 +95,7 @@ async def get_campaign(
 async def create_campaign(
     request: CreateCampaignRequest, user: CurrentUser = Depends(require_business_owner)
 ):
-    """
-    Create a new campaign.
-
-    Business Owner only.
-    Campaign starts in PENDING status - requires admin approval.
-    """
+    """Create a new campaign."""
     try:
         campaign = await campaign_service.create_campaign(
             owner_id=user.user_id, request=request

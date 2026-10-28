@@ -1,4 +1,3 @@
-/* Shared display helpers. Authentication stays in an HttpOnly server cookie. */
 const BossUp = {
   user: null,
   ready: API.getCurrentUser()

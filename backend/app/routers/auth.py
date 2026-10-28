@@ -1,13 +1,4 @@
-"""
-Authentication Router
-======================
-Handles signup, login, and user profile endpoints.
-
-Endpoints:
-- POST /auth/signup - Register new user
-- POST /auth/login - Authenticate user
-- GET /auth/me - Get current user profile
-"""
+"""Account signup, login and session routes."""
 
 import os
 from fastapi import APIRouter, HTTPException, Depends, status, Response
@@ -38,13 +29,7 @@ def set_session(response, token):
 
 @router.post("/signup", response_model=TokenResponse)
 async def signup(request: SignupRequest, response: Response):
-    """
-    Register a new user.
-
-    - Creates Firebase Auth user
-    - Creates Firestore profile
-    - Returns JWT token
-    """
+    """Register a new user."""
     try:
         token = await auth_service.signup(request)
         set_session(response, token)
@@ -60,12 +45,7 @@ async def signup(request: SignupRequest, response: Response):
 
 @router.post("/login", response_model=TokenResponse)
 async def login(request: LoginRequest, response: Response):
-    """
-    Authenticate user and return JWT.
-
-    Note: For production, implement proper password verification
-    using Firebase REST API or client SDK proxy.
-    """
+    """Authenticate user and return JWT."""
     try:
         token = await auth_service.login(request)
         set_session(response, token)

@@ -1,34 +1,19 @@
-/* BossUp EA Design System - Based on PNG Templates */
-
-/* ============================================
-   CSS Custom Properties (Design Tokens)
-   ============================================ */
-
 :root {
-    /* Primary Colors - From PNG Templates */
     --primary-green: #1a4d2e;
     --primary-green-dark: #143d24;
     --primary-green-light: #2d6a4f;
     --primary-gold: #d4a853;
     --primary-gold-dark: #b8923f;
     --primary-gold-light: #e4c47a;
-
-    /* Neutral Colors */
     --text-primary: #1f2937;
     --text-secondary: #4b5563;
     --text-muted: #9ca3af;
     --text-white: #ffffff;
-
-    /* Background Colors */
     --bg-white: #ffffff;
     --bg-light: #f9fafb;
     --bg-gray: #f3f4f6;
-
-    /* Border Colors */
     --border-light: #e5e7eb;
     --border-medium: #d1d5db;
-
-    /* Status Colors */
     --success-green: #22c55e;
     --success-bg: rgba(34, 197, 94, 0.1);
     --warning-yellow: #eab308;
@@ -37,8 +22,6 @@
     --danger-bg: rgba(239, 68, 68, 0.1);
     --info-blue: #3b82f6;
     --info-bg: rgba(59, 130, 246, 0.1);
-
-    /* Typography */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-size-xs: 11px;
     --font-size-sm: 13px;
@@ -48,15 +31,11 @@
     --font-size-2xl: 28px;
     --font-size-3xl: 36px;
     --font-size-4xl: 48px;
-
-    /* Font Weights */
     --font-normal: 400;
     --font-medium: 500;
     --font-semibold: 600;
     --font-bold: 700;
     --font-extrabold: 800;
-
-    /* Spacing */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
     --spacing-md: 16px;
@@ -64,33 +43,21 @@
     --spacing-xl: 32px;
     --spacing-2xl: 48px;
     --spacing-3xl: 64px;
-
-    /* Border Radius */
     --radius-sm: 4px;
     --radius-md: 8px;
     --radius-lg: 12px;
     --radius-xl: 16px;
     --radius-full: 9999px;
-
-    /* Shadows */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
     --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
     --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
-
-    /* Transitions */
     --transition-fast: 0.15s ease;
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
-
-    /* Container */
     --container-max: 1200px;
     --container-padding: 24px;
 }
-
-/* ============================================
-   Base Reset & Typography
-   ============================================ */
 
 *, *::before, *::after {
     margin: 0;
@@ -136,10 +103,6 @@ input, textarea, select {
     font-size: inherit;
 }
 
-/* ============================================
-   Layout Utilities
-   ============================================ */
-
 .container {
     max-width: var(--container-max);
     margin: 0 auto;
@@ -149,10 +112,6 @@ input, textarea, select {
 .section {
     padding: var(--spacing-3xl) 0;
 }
-
-/* ============================================
-   Button Components
-   ============================================ */
 
 .btn {
     display: inline-flex;
@@ -219,10 +178,6 @@ input, textarea, select {
     font-size: var(--font-size-base);
 }
 
-/* ============================================
-   Badge Components
-   ============================================ */
-
 .badge {
     display: inline-flex;
     align-items: center;
@@ -256,10 +211,6 @@ input, textarea, select {
     background: var(--primary-gold);
     color: var(--text-white);
 }
-
-/* ============================================
-   Card Components
-   ============================================ */
 
 .card {
     background: var(--bg-white);
@@ -295,10 +246,6 @@ input, textarea, select {
     color: var(--text-secondary);
 }
 
-/* ============================================
-   Form Elements
-   ============================================ */
-
 .form-group {
     margin-bottom: var(--spacing-md);
 }
@@ -330,10 +277,6 @@ input, textarea, select {
     color: var(--text-muted);
 }
 
-/* ============================================
-   Progress Bar
-   ============================================ */
-
 .progress-bar {
     height: 8px;
     background: var(--bg-gray);
@@ -351,10 +294,6 @@ input, textarea, select {
 .progress-fill.gold {
     background: var(--primary-gold);
 }
-
-/* ============================================
-   Navbar Styles
-   ============================================ */
 
 .navbar {
     background: var(--bg-white);
@@ -412,10 +351,6 @@ input, textarea, select {
     align-items: center;
     gap: 12px;
 }
-
-/* ============================================
-   Footer Styles
-   ============================================ */
 
 .footer {
     background: var(--primary-green);
@@ -490,10 +425,6 @@ input, textarea, select {
 .footer-social a:hover {
     color: var(--primary-gold);
 }
-
-/* ============================================
-   Responsive Breakpoints
-   ============================================ */
 
 @media (max-width: 1024px) {
     .footer-grid {

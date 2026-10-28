@@ -1,17 +1,4 @@
-"""
-Admin Router
-=============
-Administrative endpoints for campaign approval, user management, and audit logs.
-
-Endpoints:
-- GET /admin/campaigns/pending - List pending campaigns
-- POST /admin/campaigns/{id}/approve - Approve campaign
-- POST /admin/campaigns/{id}/reject - Reject campaign
-- GET /admin/users - List users
-- POST /admin/users/{id}/kyc - Update KYC status
-- GET /admin/audit-logs - View audit logs
-- GET /admin/stats - Platform statistics
-"""
+"""Administrator campaign review and user verification routes."""
 
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends, status as http_status, Query
@@ -34,11 +21,6 @@ from app.services.campaign_service import (
 from app.services.auth_service import auth_service
 
 router = APIRouter()
-
-
-# =============================================================================
-# REQUEST/RESPONSE MODELS
-# =============================================================================
 
 
 class RejectCampaignRequest(BaseModel):
@@ -85,11 +67,6 @@ class PlatformStats(BaseModel):
     total_transactions: int
 
 
-# =============================================================================
-# CAMPAIGN MANAGEMENT
-# =============================================================================
-
-
 @router.get("/campaigns/pending", response_model=CampaignListResponse)
 async def get_pending_campaigns(admin: CurrentUser = Depends(require_admin)):
     """
@@ -131,12 +108,7 @@ async def get_all_campaigns(
 async def approve_campaign(
     campaign_id: str, admin: CurrentUser = Depends(require_admin)
 ):
-    """
-    Approve a pending campaign.
-
-    Changes status from PENDING to LIVE.
-    Admin only.
-    """
+    """Approve a pending campaign."""
     try:
         campaign = await campaign_service.approve_campaign(
             campaign_id=campaign_id, admin_id=admin.user_id
@@ -164,11 +136,6 @@ async def reject_campaign(
         return campaign
     except ValueError as e:
         raise HTTPException(status_code=http_status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-
-# =============================================================================
-# USER MANAGEMENT
-# =============================================================================
 
 
 @router.get("/users", response_model=list[UserListItem])
@@ -238,11 +205,6 @@ async def update_user_kyc(
         )
 
 
-# =============================================================================
-# AUDIT LOGS
-# =============================================================================
-
-
 @router.get("/audit-logs", response_model=list[AuditLogItem])
 async def get_audit_logs(
     action: Optional[str] = Query(None, description="Filter by action type"),
@@ -288,11 +250,6 @@ async def get_audit_logs(
         )
 
 
-# =============================================================================
-# PLATFORM STATISTICS
-# =============================================================================
-
-
 @router.get("/stats", response_model=PlatformStats)
 async def get_platform_stats(admin: CurrentUser = Depends(require_admin)):
     """
@@ -301,11 +258,9 @@ async def get_platform_stats(admin: CurrentUser = Depends(require_admin)):
     Admin only.
     """
     try:
-        # Count users
         users_query = users_collection().stream()
         total_users = sum(1 for _ in users_query)
 
-        # Count campaigns
         all_campaigns = campaigns_collection().stream()
         campaigns_list = list(all_campaigns)
         total_campaigns = len(campaigns_list)
@@ -326,7 +281,6 @@ async def get_platform_stats(admin: CurrentUser = Depends(require_admin)):
                 currency, 0
             ) + data.get("raised_amount", 0)
 
-        # Count transactions
         transactions_query = transactions_collection().stream()
         total_transactions = sum(1 for _ in transactions_query)
 

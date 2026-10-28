@@ -1,13 +1,4 @@
-"""
-Campaign Service
-=================
-Business logic for campaign CRUD and management.
-
-Security:
-- All operations require authenticated user
-- Ownership checks for edit/delete
-- Admin approval required for campaigns to go LIVE
-"""
+"""Create, review and update donation campaigns."""
 
 from datetime import datetime
 from typing import List, Optional
@@ -19,19 +10,14 @@ from app.core.firebase import campaigns_collection, users_collection
 from app.core.security import log_audit_event
 
 
-# =============================================================================
-# MODELS
-# =============================================================================
-
-
 class CampaignStatus(str, Enum):
     """Campaign lifecycle status."""
 
-    PENDING = "PENDING"  # Awaiting admin approval
-    LIVE = "LIVE"  # Active and accepting investments
-    REJECTED = "REJECTED"  # Admin rejected
-    COMPLETED = "COMPLETED"  # Target reached
-    CANCELLED = "CANCELLED"  # Owner cancelled
+    PENDING = "PENDING"
+    LIVE = "LIVE"
+    REJECTED = "REJECTED"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
 
 
 class CreateCampaignRequest(BaseModel):
@@ -89,11 +75,6 @@ class CampaignListResponse(BaseModel):
     total: int
 
 
-# =============================================================================
-# CAMPAIGN SERVICE
-# =============================================================================
-
-
 class CampaignService:
     """Campaign management service."""
 
@@ -121,11 +102,9 @@ class CampaignService:
             "updated_at": datetime.utcnow().isoformat(),
         }
 
-        # Create document
         doc_ref = campaigns_collection().add(campaign_data)
         campaign_id = doc_ref[1].id
 
-        # Audit log
         log_audit_event(
             action="CAMPAIGN_CREATED",
             user_id=owner_id,
@@ -152,13 +131,7 @@ class CampaignService:
         owner_id: Optional[str] = None,
         limit: int = 50,
     ) -> CampaignListResponse:
-        """
-        List campaigns with optional filters.
-
-        - Public marketplace: status=LIVE
-        - Owner dashboard: owner_id=current_user
-        - Admin: all statuses
-        """
+        """List campaigns with optional filters."""
         query = campaigns_collection()
 
         if status:
@@ -195,15 +168,12 @@ class CampaignService:
 
         data = doc.to_dict()
 
-        # Ownership check
         if data["owner_id"] != owner_id:
             raise PermissionError("You do not own this campaign")
 
-        # Can't edit live campaigns
         if data["status"] == CampaignStatus.LIVE.value:
             raise ValueError("Cannot edit a live campaign")
 
-        # Build update
         update_data = {"updated_at": datetime.utcnow().isoformat()}
 
         if request.title:
@@ -220,7 +190,6 @@ class CampaignService:
 
         doc_ref.update(update_data)
 
-        # Return updated
         return await CampaignService.get_campaign(campaign_id)
 
     @staticmethod
@@ -311,7 +280,6 @@ class CampaignService:
             "updated_at": datetime.utcnow().isoformat(),
         }
 
-        # Check if target reached
         if new_raised >= data.get("target_amount", 0):
             update_data["status"] = CampaignStatus.COMPLETED.value
             update_data["completed_at"] = datetime.utcnow().isoformat()
@@ -319,5 +287,4 @@ class CampaignService:
         doc_ref.update(update_data)
 
 
-# Singleton instance
 campaign_service = CampaignService()

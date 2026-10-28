@@ -1,13 +1,4 @@
-"""
-Authentication Service
-=======================
-Handles user registration, login, and Firebase Auth integration.
-
-Security:
-- Firebase Auth for identity (backend-side only)
-- Custom JWT issued after Firebase verification
-- Roles stored in Firestore, NOT Firebase custom claims
-"""
+"""Register users and verify Firebase passwords."""
 
 from datetime import datetime
 from typing import Optional
@@ -27,11 +18,6 @@ from app.core.security import (
     log_audit_event,
     TokenResponse,
 )
-
-
-# =============================================================================
-# REQUEST/RESPONSE MODELS
-# =============================================================================
 
 
 class SignupRequest(BaseModel):
@@ -70,32 +56,13 @@ class UserProfile(BaseModel):
     created_at: str
 
 
-# =============================================================================
-# AUTHENTICATION SERVICE
-# =============================================================================
-
-
 class AuthService:
-    """
-    Authentication service - Firebase Auth + Firestore.
-
-    Flow:
-    1. Create user in Firebase Auth
-    2. Store profile & role in Firestore
-    3. Issue custom JWT
-    """
+    """Authentication service - Firebase Auth + Firestore."""
 
     @staticmethod
     async def signup(request: SignupRequest) -> TokenResponse:
-        """
-        Register a new user.
-
-        1. Create Firebase Auth user
-        2. Create Firestore user document
-        3. Issue JWT
-        """
+        """Register a new user."""
         try:
-            # Step 1: Create Firebase Auth user
             firebase_user = firebase_auth.create_user(
                 email=request.email,
                 password=request.password,
@@ -104,7 +71,6 @@ class AuthService:
 
             user_id = firebase_user.uid
 
-            # Step 2: Create Firestore user document
             user_data = {
                 "email": request.email,
                 "role": request.role.value,
@@ -117,14 +83,12 @@ class AuthService:
 
             users_collection().document(user_id).set(user_data)
 
-            # Step 3: Audit log
             log_audit_event(
                 action="USER_SIGNUP",
                 user_id=user_id,
                 details={"email": request.email, "role": request.role.value},
             )
 
-            # Step 4: Issue custom JWT
             return create_access_token(
                 user_id=user_id, email=request.email, role=request.role
             )
@@ -160,7 +124,6 @@ class AuthService:
             if firebase_user.disabled or response.json().get("localId") != user_id:
                 raise ValueError("Invalid email or password")
 
-            # Get user profile from Firestore
             user_doc = users_collection().document(user_id).get()
 
             if not user_doc.exists:
@@ -168,12 +131,10 @@ class AuthService:
 
             user_data = user_doc.to_dict()
 
-            # Audit log
             log_audit_event(
                 action="USER_LOGIN", user_id=user_id, details={"email": request.email}
             )
 
-            # Issue custom JWT
             return create_access_token(
                 user_id=user_id, email=request.email, role=UserRole(user_data["role"])
             )
@@ -225,5 +186,4 @@ class AuthService:
         return True
 
 
-# Singleton instance
 auth_service = AuthService()

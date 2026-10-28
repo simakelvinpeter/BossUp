@@ -1,51 +1,30 @@
-"""
-Firebase Admin SDK Initialization
-==================================
-Backend-only Firebase access. NO frontend Firebase SDK usage.
-
-Security:
-- Service account credentials stored securely (env var or file)
-- Firestore accessed only through this module
-- All Firebase operations go through backend
-"""
+"""Connect backend services to Firebase."""
 
 import os
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
 from typing import Optional
 
-# Global Firestore client
 _db: Optional[firestore.Client] = None
 
 
 def initialize_firebase() -> None:
-    """
-    Initialize Firebase Admin SDK.
-
-    Uses service account credentials from:
-    1. GOOGLE_APPLICATION_CREDENTIALS env var (path to JSON file)
-    2. FIREBASE_CREDENTIALS env var (JSON string)
-    3. Default: firebase-credentials.json in backend root
-    """
+    """Initialize Firebase Admin SDK."""
     global _db
 
     if firebase_admin._apps:
-        # Already initialized
         _db = firestore.client()
         return
 
     cred = None
 
-    # Option 1: Path to credentials file via env var
     cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     if cred_path and os.path.exists(cred_path):
         cred = credentials.Certificate(cred_path)
 
-    # Option 2: Default path
     elif os.path.exists("firebase-credentials.json"):
         cred = credentials.Certificate("firebase-credentials.json")
 
-    # Option 3: JSON string in env var
     elif os.getenv("FIREBASE_CREDENTIALS"):
         import json
 
@@ -73,11 +52,6 @@ def get_firestore() -> firestore.Client:
 def get_firebase_auth():
     """Get Firebase Auth module for user management."""
     return auth
-
-
-# =============================================================================
-# FIRESTORE COLLECTIONS (Type-safe access)
-# =============================================================================
 
 
 class Collections:
