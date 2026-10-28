@@ -1,31 +1,16 @@
-"""
-Payments Router
-================
-Payment initiation and confirmation endpoints.
+"""Authenticated donation checkout and verified Flutterwave v3 notifications."""
 
-Endpoints:
-- POST /payments/initiate - Start payment flow
-- POST /payments/confirm - Webhook/callback to confirm
-- GET /payments/{id} - Get transaction details
-- GET /payments/my - Get user's transactions
-- GET /payments/stub-checkout - Development checkout page
-"""
-
-from fastapi import APIRouter, HTTPException, Depends, status
-from fastapi.responses import HTMLResponse
-
-from app.core.security import (
-    get_current_user,
-    require_investor,
-    CurrentUser
-)
+import hmac
+import os
+from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import ValidationError
+from app.core.security import get_current_user, require_investor, CurrentUser, UserRole
 from app.services.payment_service import (
     payment_service,
     InitiatePaymentRequest,
     ConfirmPaymentRequest,
     PaymentSessionResponse,
     TransactionResponse,
-    TransactionStatus
 )
 
 router = APIRouter()
@@ -33,155 +18,80 @@ router = APIRouter()
 
 @router.post("/initiate", response_model=PaymentSessionResponse)
 async def initiate_payment(
-    request: InitiatePaymentRequest,
-    user: CurrentUser = Depends(require_investor)
+    request: InitiatePaymentRequest, user: CurrentUser = Depends(require_investor)
 ):
-    """
-    Initiate payment flow.
-    
-    Investor only.
-    
-    1. Creates transaction record
-    2. Creates gateway session
-    3. Returns checkout URL
-    """
     try:
-        session = await payment_service.initiate_payment(
-            user_id=user.user_id,
-            request=request
-        )
-        return session
-    except Exception as e:
+        return await payment_service.initiate_payment(user.user_id, request)
+    except ValueError as error:
+        raise HTTPException(400, str(error)) from None
+    except Exception:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Payment initiation failed: {str(e)}"
-        )
+            502, "Checkout is unavailable. Please try again later."
+        ) from None
 
 
 @router.post("/confirm", response_model=TransactionResponse)
-async def confirm_payment(request: ConfirmPaymentRequest):
-    """
-    Confirm payment (webhook/callback).
-    
-    Called by payment gateway webhook or frontend after redirect.
-    Updates transaction status and campaign raised amount.
-    """
+async def confirm_payment(
+    request: ConfirmPaymentRequest, user: CurrentUser = Depends(get_current_user)
+):
     try:
-        transaction = await payment_service.confirm_payment(request)
-        return transaction
-    except ValueError as e:
+        donation = await payment_service.get_transaction(request.transaction_id)
+        if donation.user_id != user.user_id:
+            raise HTTPException(403, "Access denied")
+        return await payment_service.confirm_payment(request)
+    except ValueError as error:
+        raise HTTPException(400, str(error)) from None
+    except HTTPException:
+        raise
+    except Exception:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            502, "Payment verification is temporarily unavailable"
+        ) from None
+
+
+@router.post("/webhook")
+async def payment_webhook(request: Request):
+    secret = os.getenv("FLW_SECRET_HASH", "")
+    signature = request.headers.get("verif-hash", "")
+    if not secret or not hmac.compare_digest(secret.encode(), signature.encode()):
+        raise HTTPException(401, "Invalid webhook signature")
+    body = await request.body()
+    if len(body) > 65536:
+        raise HTTPException(413, "Webhook is too large")
+    try:
+        payload = await request.json()
+        data = payload.get("data", {})
+        if (
+            payload.get("event") != "charge.completed"
+            or data.get("status") != "successful"
+        ):
+            return {"received": True}
+        confirmation = ConfirmPaymentRequest(
+            transaction_id=data.get("tx_ref"),
+            gateway_reference=str(data.get("id")),
         )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Payment confirmation failed: {str(e)}"
-        )
+        await payment_service.confirm_payment(confirmation)
+    except (ValueError, ValidationError):
+        raise HTTPException(400, "Payment receipt could not be verified") from None
+    except Exception:
+        # Do not acknowledge a failed write; Flutterwave can retry safely.
+        raise HTTPException(503, "Please retry this notification") from None
+    return {"received": True}
 
 
 @router.get("/my", response_model=list[TransactionResponse])
-async def get_my_transactions(
-    user: CurrentUser = Depends(get_current_user)
-):
-    """
-    Get current user's transactions.
-    """
-    try:
-        transactions = await payment_service.get_user_transactions(user.user_id)
-        return transactions
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch transactions: {str(e)}"
-        )
+async def get_my_transactions(user: CurrentUser = Depends(get_current_user)):
+    return await payment_service.get_user_transactions(user.user_id)
 
 
 @router.get("/{transaction_id}", response_model=TransactionResponse)
 async def get_transaction(
-    transaction_id: str,
-    user: CurrentUser = Depends(get_current_user)
+    transaction_id: str, user: CurrentUser = Depends(get_current_user)
 ):
-    """
-    Get single transaction by ID.
-    
-    User can only view their own transactions.
-    """
     try:
-        transaction = await payment_service.get_transaction(transaction_id)
-        
-        # Ownership check (or admin)
-        if transaction.user_id != user.user_id:
-            from app.core.security import UserRole
-            if user.role != UserRole.ADMIN:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Access denied"
-                )
-        
-        return transaction
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
-        )
-
-
-@router.get("/stub-checkout", response_class=HTMLResponse)
-async def stub_checkout_page(ref: str):
-    """
-    Stub checkout page for development.
-    
-    Replace with real payment gateway redirect in production.
-    """
-    html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Payment Checkout (Stub)</title>
-        <style>
-            body {{ font-family: Arial, sans-serif; padding: 40px; text-align: center; }}
-            .container {{ max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }}
-            h2 {{ color: #333; }}
-            p {{ color: #666; }}
-            .btn {{ padding: 12px 24px; margin: 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }}
-            .btn-success {{ background: #28a745; color: white; }}
-            .btn-danger {{ background: #dc3545; color: white; }}
-            .ref {{ font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h2>🧪 Test Payment Gateway</h2>
-            <p>Transaction Reference:</p>
-            <p class="ref">{ref}</p>
-            <p>This is a stub checkout page for development.</p>
-            <hr>
-            <button class="btn btn-success" onclick="confirmPayment('COMPLETED')">✅ Simulate Success</button>
-            <button class="btn btn-danger" onclick="confirmPayment('FAILED')">❌ Simulate Failure</button>
-        </div>
-        <script>
-            async function confirmPayment(status) {{
-                const response = await fetch('/payments/confirm', {{
-                    method: 'POST',
-                    headers: {{ 'Content-Type': 'application/json' }},
-                    body: JSON.stringify({{
-                        transaction_id: '{ref}',
-                        gateway_reference: 'stub_ref_' + Date.now(),
-                        status: status
-                    }})
-                }});
-                
-                if (response.ok) {{
-                    alert('Payment ' + status.toLowerCase() + '!');
-                    window.location.href = '/payment-complete.html?status=' + status;
-                }} else {{
-                    alert('Error processing payment');
-                }}
-            }}
-        </script>
-    </body>
-    </html>
-    """
-    return HTMLResponse(content=html)
+        donation = await payment_service.get_transaction(transaction_id)
+    except ValueError:
+        raise HTTPException(404, "Transaction not found") from None
+    if donation.user_id != user.user_id and user.role != UserRole.ADMIN:
+        raise HTTPException(403, "Access denied")
+    return donation

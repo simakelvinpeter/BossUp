@@ -21,42 +21,43 @@ _db: Optional[firestore.Client] = None
 def initialize_firebase() -> None:
     """
     Initialize Firebase Admin SDK.
-    
+
     Uses service account credentials from:
     1. GOOGLE_APPLICATION_CREDENTIALS env var (path to JSON file)
     2. FIREBASE_CREDENTIALS env var (JSON string)
     3. Default: firebase-credentials.json in backend root
     """
     global _db
-    
+
     if firebase_admin._apps:
         # Already initialized
         _db = firestore.client()
         return
-    
+
     cred = None
-    
+
     # Option 1: Path to credentials file via env var
     cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     if cred_path and os.path.exists(cred_path):
         cred = credentials.Certificate(cred_path)
-    
+
     # Option 2: Default path
     elif os.path.exists("firebase-credentials.json"):
         cred = credentials.Certificate("firebase-credentials.json")
-    
+
     # Option 3: JSON string in env var
     elif os.getenv("FIREBASE_CREDENTIALS"):
         import json
+
         cred_dict = json.loads(os.getenv("FIREBASE_CREDENTIALS"))
         cred = credentials.Certificate(cred_dict)
-    
+
     else:
         raise RuntimeError(
             "Firebase credentials not found. Set GOOGLE_APPLICATION_CREDENTIALS "
             "or place firebase-credentials.json in backend root."
         )
-    
+
     firebase_admin.initialize_app(cred)
     _db = firestore.client()
 
@@ -78,8 +79,10 @@ def get_firebase_auth():
 # FIRESTORE COLLECTIONS (Type-safe access)
 # =============================================================================
 
+
 class Collections:
     """Firestore collection names - single source of truth."""
+
     USERS = "users"
     CAMPAIGNS = "campaigns"
     TRANSACTIONS = "transactions"

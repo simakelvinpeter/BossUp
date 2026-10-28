@@ -1,244 +1,101 @@
-# BossUp - African Business Crowdfunding Platform
+# BossUp — East African campaign donations
 
-A production-ready MVP for connecting investors with African businesses.
+BossUp helps people support administrator-reviewed business campaigns through donations. Tanzania is the launch country, and new campaigns default to TZS. Donations do not buy shares, interest, ownership or promised financial returns.
 
-## 🏗️ Architecture
+## Current status
 
-**Security-First Design:**
-- Firebase = Auth + Database (backend-only)
-- FastAPI = Authority + Logic
-- Frontend NEVER touches Firebase directly
-- Custom JWT issued by backend
+The application connects signup, password login, campaign drafts/submission, administrator review, donor receipts and hosted checkout. Backend tests cover password rejection, blocked administrator signup, receipt validation, repeated payment confirmation and secure session cookies. Browser tests use explicit API fixtures; they do not prove a live Firebase or merchant integration.
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│                 │     │                 │     │                 │
-│    Frontend     │────▶│    FastAPI      │────▶│    Firebase     │
-│   (HTML/JS)     │     │    Backend      │     │   (Firestore)   │
-│                 │◀────│                 │◀────│                 │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-        │                       │
-        │    Custom JWT         │   Firebase Admin SDK
-        └───────────────────────┘
+**Live launch is not yet verified.** Configure your Firebase project and approved Tanzanian Flutterwave merchant account, complete the sandbox acceptance steps below, and verify deployment before accepting real donations. Payments remain disabled by default. Campaign disbursements and refunds require manual operator review through the payment provider; there is no automatic wallet withdrawal or owner payout system.
+
+## Run locally
+
+Use Python 3.13. From the repository root:
+
+```sh
+python -m venv .venv
 ```
 
-## 📁 Project Structure
+Activate with `.venv\Scripts\Activate.ps1` in PowerShell, or `source .venv/bin/activate` on Linux/macOS.
 
-```
-ENIVE/
-├── backend/
-│   ├── app/
-│   │   ├── main.py              # FastAPI application
-│   │   ├── core/
-│   │   │   ├── firebase.py      # Firebase Admin SDK
-│   │   │   └── security.py      # JWT & role enforcement
-│   │   ├── services/
-│   │   │   ├── auth_service.py
-│   │   │   ├── campaign_service.py
-│   │   │   └── payment_service.py
-│   │   └── routers/
-│   │       ├── auth.py
-│   │       ├── campaigns.py
-│   │       ├── payments.py
-│   │       └── admin.py
-│   ├── requirements.txt
-│   └── .env.example
-│
-├── frontend/
-│   ├── index.html
-│   ├── login.html
-│   ├── signup.html
-│   ├── marketplace.html
-│   ├── campaign.html
-│   ├── investor-dashboard.html
-│   ├── business-dashboard.html
-│   ├── admin.html
-│   └── assets/
-│       ├── css/
-│       └── js/
-│
-└── README.md
+```sh
+python -m pip install -r backend/requirements.txt
 ```
 
-## 🚀 Quick Start
+Copy backend/.env.example to backend/.env. Configure:
 
-### 1. Firebase Setup
+- JWT_SECRET_KEY: generate a random value with `python -c "import secrets; print(secrets.token_urlsafe(48))"`.
+- GOOGLE_APPLICATION_CREDENTIALS: absolute path to your Firebase service-account JSON. Keep it outside frontend/ and out of Git.
+- FIREBASE_WEB_API_KEY: your Firebase project's web API key. Enable Email/Password sign-in in Firebase Authentication and create the Firestore database.
 
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Create a new project or use existing
-3. Enable **Firestore Database**
-4. Go to Project Settings → Service Accounts
-5. Click "Generate new private key"
-6. Save as `firebase-credentials.json` in `/backend/`
-
-### 2. Backend Setup
-
-```bash
-cd backend
-
-# Create virtual environment
-python -m venv venv
-
-# Activate (Windows)
-venv\Scripts\activate
-
-# Activate (Mac/Linux)
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Copy environment file
-copy .env.example .env
-
-# Edit .env with your settings
-# IMPORTANT: Set a strong JWT_SECRET_KEY for production!
-
-# Run the server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```sh
+python -m uvicorn app.main:app --app-dir backend --env-file backend/.env --host 127.0.0.1 --port 8000
 ```
 
-### 3. Frontend Setup
+Open http://127.0.0.1:8000. The same server serves the original HTML/CSS interface and API. There is no second frontend server to configure.
 
-```bash
-cd frontend
+## Accounts and administrator access
 
-# Option 1: VS Code Live Server extension
-# Right-click index.html → "Open with Live Server"
+Create your own account on signup.html. There are no shared production demo passwords. Donors support campaigns; business owners submit them. The legacy API role name INVESTOR is retained internally for compatibility, while the interface uses donation language.
 
-# Option 2: Python HTTP server
-python -m http.server 5500
+To make your existing account an administrator, run this locally with your backend Firebase administrator credentials:
 
-# Option 3: Node.js serve
-npx serve -l 5500
+```sh
+python tools/promote_admin.py your-email@example.com
 ```
 
-### 4. Access the Application
+Sign in with that account's existing password. Public signup cannot grant administrator access. Administrators verify owners, approve/reject campaigns and review audit logs. Verification is a manual check, not an automated identity-verification service.
 
-- **Frontend:** http://localhost:5500
-- **Backend API:** http://localhost:8000
-- **API Docs:** http://localhost:8000/docs
+## Flutterwave for Tanzania
 
-## 👥 User Roles
+The integration uses Flutterwave v3 hosted checkout. TZS offers card and mobilemoneytanzania; the code also supports KES/M-Pesa, UGX/mobilemoneyuganda and RWF/mobilemoneyrwanda when enabled for your merchant account. Provider availability and merchant approval must be confirmed for your business model and registration country.
 
-| Role | Access |
-|------|--------|
-| **INVESTOR** | Browse campaigns, invest, view portfolio |
-| **BUSINESS_OWNER** | Create campaigns, track funding |
-| **ADMIN** | Approve/reject campaigns, manage users, view audit logs |
+1. Complete merchant onboarding for the Tanzanian business and obtain approval to collect campaign donations. Confirm settlement/disbursement arrangements for campaign owners.
+2. Start with a test-mode FLW_SECRET_KEY in the backend environment.
+3. Set an HTTPS PAYMENT_RETURN_URL ending in /payment-complete.html on your deployment.
+4. Set a random FLW_SECRET_HASH and configure that same value in the Flutterwave v3 webhook settings. The webhook URL is https://your-domain/payments/webhook. Enable webhook retries.
+5. Set PAYMENTS_ENABLED=true only for the configured environment. Never place secret keys in HTML or JavaScript.
 
-## 🔐 Security Features
+The server ignores submitted success statuses. It verifies provider status, reference, amount, currency and transaction ID. A Firestore transaction credits a receipt once, even if a webhook repeats. Campaign currencies are never added together as if they were the same money.
 
-- ✅ Firebase Admin SDK (backend-only)
-- ✅ Custom JWT with role claims
-- ✅ Role-based access control
-- ✅ Ownership verification
-- ✅ Audit logging
-- ✅ No secrets in frontend
+Provider references:
 
-## 📊 Firestore Data Model
+- [Hosted checkout](https://developer.flutterwave.com/docs/flutterwave-standard-1)
+- [Supported payment methods](https://developer.flutterwave.com/docs/payment-methods)
+- [Receipt verification](https://developer.flutterwave.com/docs/transaction-verification)
+- [v3 webhooks](https://developer.flutterwave.com/docs/webhooks)
 
-### users/{userId}
-```json
-{
-  "email": "user@example.com",
-  "role": "INVESTOR | BUSINESS_OWNER | ADMIN",
-  "country": "NG",
-  "kyc_status": "PENDING | VERIFIED | REJECTED",
-  "created_at": "2024-01-01T00:00:00Z"
-}
+## Acceptance before live launch
+
+Use a separate test Firebase project and Flutterwave test environment. Check a business signup, owner verification, campaign submission and approval, then a donor checkout. Confirm successful, cancelled, pending and declined payments. Repeat the same webhook and confirmation; the campaign total must increase only once. Confirm that a different account cannot access private campaign drafts or another donor's receipt.
+
+The automated unit tests mock provider and database boundaries. They do not replace this sandbox test, Firestore transaction validation, a real settlement/refund rehearsal, or a small approved live payment test. Publish operator contact details and reviewed donation/refund/privacy terms before taking live donations.
+
+## Deployment
+
+A Dockerfile is included. Supply the same environment settings securely, set ENVIRONMENT=production and use HTTPS. Mount credentials read-only or use FIREBASE_CREDENTIALS as a secret JSON environment value. No credential file is copied into the image.
+
+Firestore is the persistent database; back it up and restrict client access because the browser talks only to this backend. Run one application worker: the simple abuse limiter is kept in process memory. A deployment with several workers/replicas needs a shared limiter. Do not publish the application without configuring its operator policies and completing merchant acceptance.
+
+## Checks
+
+```sh
+python -m pytest -q
+python -m pip install playwright
+python -m playwright install chromium
+python tests/browser_smoke.py
 ```
 
-### campaigns/{campaignId}
-```json
-{
-  "owner_id": "userId",
-  "title": "Campaign Title",
-  "description": "...",
-  "country": "NG",
-  "target_amount": 50000,
-  "raised_amount": 12500,
-  "status": "PENDING | LIVE | REJECTED | COMPLETED"
-}
-```
+On this Windows workstation, set BROWSER_CHANNEL=msedge to use installed Edge instead of downloading Chromium. Browser fixtures never charge a card or contact Firebase. GitHub Actions runs both suites.
 
-### transactions/{txId}
-```json
-{
-  "user_id": "investorId",
-  "campaign_id": "campaignId",
-  "amount": 1000,
-  "status": "PENDING | COMPLETED | FAILED",
-  "created_at": "2024-01-01T00:00:00Z"
-}
-```
+## Code map
 
-## 🔌 API Endpoints
-
-### Authentication
-- `POST /auth/signup` - Register new user
-- `POST /auth/login` - Authenticate & get JWT
-- `GET /auth/me` - Get current user profile
-
-### Campaigns
-- `GET /campaigns` - List live campaigns
-- `GET /campaigns/{id}` - Get campaign details
-- `POST /campaigns` - Create campaign (Business Owner)
-- `PUT /campaigns/{id}` - Update campaign (Owner)
-
-### Payments
-- `POST /payments/initiate` - Start payment (Investor)
-- `POST /payments/confirm` - Confirm payment (Webhook)
-- `GET /payments/my` - Get user transactions
-
-### Admin
-- `GET /admin/campaigns/pending` - List pending approvals
-- `POST /admin/campaigns/{id}/approve` - Approve campaign
-- `POST /admin/campaigns/{id}/reject` - Reject campaign
-- `GET /admin/users` - List users
-- `GET /admin/audit-logs` - View audit logs
-
-## ⚠️ Production Checklist
-
-- [ ] Set strong `JWT_SECRET_KEY`
-- [ ] Configure Firestore security rules
-- [ ] Set up proper CORS origins
-- [ ] Implement rate limiting
-- [ ] Add HTTPS
-- [ ] Replace payment stub with real gateway
-- [ ] Implement proper password verification
-- [ ] Set up monitoring & alerts
-
-## 📝 Development Notes
-
-### Payment Integration
-
-The payment system uses a stub gateway for development. To integrate a real provider:
-
-1. Create a new class implementing `PaymentGateway`
-2. Implement `create_session()` and `verify_payment()`
-3. Update `PaymentService` initialization
-4. Add webhook endpoint for gateway callbacks
-
-### Firebase Rules (Defensive)
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Default: deny all direct access
-    // All access should go through backend
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-}
-```
-
-## 📄 License
-
-MIT License - See LICENSE file
-
----
-
-Built with ❤️ for African entrepreneurs
+- frontend/assets/js/api.js: calls the same-origin API; it does not store login tokens.
+- frontend/assets/js/app.js: shared display helpers and current user.
+- account.js, marketplace.js, campaign.js, create-campaign.js, dashboard.js and receipt.js: one small file per page flow.
+- backend/app/services/auth_service.py: Firebase password verification and signup.
+- backend/app/services/flutterwave.py: provider HTTP requests and receipt checks.
+- backend/app/services/payment_service.py: donation records and atomic campaign credit.
+- backend/app/core/security.py: signed sessions and database-backed roles.
+- backend/tests: backend regression checks.
+- tests/browser_smoke.py: complete frontend contracts using explicit fixtures.

@@ -1,39 +1,31 @@
-"""
-Payment Service
-================
-Backend-only payment processing with abstract gateway layer.
+"""Donations are credited only after provider verification and an atomic write."""
 
-Security (NON-NEGOTIABLE):
-- NO payment secrets in frontend
-- All payment operations go through backend
-- Transactions logged in Firestore
-- Gateway abstraction for easy provider swap
-
-Payment Flow:
-1. Frontend → /payments/initiate
-2. Backend verifies JWT, creates transaction doc
-3. Backend initiates payment with gateway (stub)
-4. Returns payment session to frontend
-5. Webhook/callback updates transaction status
-6. Dashboard reflects updates
-"""
-
-from datetime import datetime
+from datetime import datetime, timezone
+from decimal import Decimal
 from typing import Optional
 from enum import Enum
-from pydantic import BaseModel
-from abc import ABC, abstractmethod
 
-from app.core.firebase import transactions_collection
-from app.core.security import log_audit_event
+from pydantic import BaseModel, Field, field_validator
+from firebase_admin import firestore
+
+from app.core.firebase import (
+    transactions_collection,
+    campaigns_collection,
+    users_collection,
+    get_firestore,
+)
+from app.services.flutterwave import (
+    FlutterwaveGateway,
+    PAYMENT_OPTIONS,
+    validate_receipt,
+)
 
 
-# =============================================================================
-# MODELS
-# =============================================================================
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
 
 class TransactionStatus(str, Enum):
-    """Payment transaction status."""
     PENDING = "PENDING"
     PROCESSING = "PROCESSING"
     COMPLETED = "COMPLETED"
@@ -42,23 +34,29 @@ class TransactionStatus(str, Enum):
 
 
 class PaymentMethod(str, Enum):
-    """Supported payment methods."""
     CARD = "CARD"
     MOBILE_MONEY = "MOBILE_MONEY"
     BANK_TRANSFER = "BANK_TRANSFER"
 
 
 class InitiatePaymentRequest(BaseModel):
-    """Request to initiate a payment."""
-    campaign_id: str
-    amount: float
-    currency: str = "USD"
+    campaign_id: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_-]+$")
+    amount: Decimal = Field(gt=0, le=100000000, max_digits=12, decimal_places=2)
+    currency: str = "TZS"
     payment_method: PaymentMethod = PaymentMethod.CARD
-    return_url: Optional[str] = None
+    return_url: Optional[str] = (
+        None  # Legacy input; the server uses its configured URL.
+    )
+
+    @field_validator("currency")
+    @classmethod
+    def supported_currency(cls, value):
+        if value not in PAYMENT_OPTIONS:
+            raise ValueError("Choose KES, UGX, TZS or RWF")
+        return value
 
 
 class PaymentSessionResponse(BaseModel):
-    """Payment session response to frontend."""
     transaction_id: str
     session_id: str
     checkout_url: str
@@ -69,7 +67,6 @@ class PaymentSessionResponse(BaseModel):
 
 
 class TransactionResponse(BaseModel):
-    """Transaction data response."""
     transaction_id: str
     user_id: str
     campaign_id: str
@@ -82,237 +79,150 @@ class TransactionResponse(BaseModel):
 
 
 class ConfirmPaymentRequest(BaseModel):
-    """Webhook/callback to confirm payment."""
-    transaction_id: str
-    gateway_reference: str
-    status: TransactionStatus
+    transaction_id: str = Field(
+        min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_-]+$"
+    )
+    gateway_reference: str = Field(pattern=r"^[0-9]{1,30}$")
 
-
-# =============================================================================
-# PAYMENT GATEWAY ABSTRACTION
-# =============================================================================
-
-class PaymentGateway(ABC):
-    """Abstract payment gateway interface."""
-    
-    @abstractmethod
-    async def create_session(
-        self,
-        amount: float,
-        currency: str,
-        reference: str,
-        return_url: str
-    ) -> dict:
-        """Create payment session with gateway."""
-        pass
-    
-    @abstractmethod
-    async def verify_payment(self, session_id: str) -> dict:
-        """Verify payment status with gateway."""
-        pass
-
-
-class StubPaymentGateway(PaymentGateway):
-    """
-    Stub payment gateway for MVP development.
-    Replace with real gateway (Stripe, Paystack, Flutterwave) in production.
-    """
-    
-    async def create_session(
-        self,
-        amount: float,
-        currency: str,
-        reference: str,
-        return_url: str
-    ) -> dict:
-        """Create fake payment session."""
-        return {
-            "session_id": f"stub_session_{reference}",
-            "checkout_url": f"http://localhost:8000/payments/stub-checkout?ref={reference}",
-            "expires_at": datetime.utcnow().isoformat()
-        }
-    
-    async def verify_payment(self, session_id: str) -> dict:
-        """Stub verification - always returns success."""
-        return {
-            "status": "success",
-            "gateway_reference": f"stub_ref_{session_id}"
-        }
-
-
-# =============================================================================
-# PAYMENT SERVICE
-# =============================================================================
 
 class PaymentService:
-    """
-    Payment processing service.
-    
-    Uses abstract gateway - swap StubPaymentGateway for real one in production.
-    """
-    
-    def __init__(self, gateway: PaymentGateway = None):
-        self.gateway = gateway or StubPaymentGateway()
-    
-    async def initiate_payment(
-        self,
-        user_id: str,
-        request: InitiatePaymentRequest
-    ) -> PaymentSessionResponse:
-        """
-        Initiate payment flow.
-        
-        1. Create transaction record in Firestore
-        2. Create session with payment gateway
-        3. Return checkout URL to frontend
-        """
-        # Create transaction document
-        transaction_data = {
+    def __init__(self, gateway=None):
+        self.gateway = gateway or FlutterwaveGateway()
+
+    async def initiate_payment(self, user_id, request):
+        campaign = campaigns_collection().document(request.campaign_id).get()
+        if not campaign.exists or campaign.to_dict().get("status") != "LIVE":
+            raise ValueError("This campaign is not accepting donations")
+        if campaign.to_dict().get("currency", "KES") != request.currency:
+            raise ValueError("Donation currency must match the campaign")
+        owner_id = campaign.to_dict().get("owner_id")
+        owner = users_collection().document(owner_id).get() if owner_id else None
+        if (
+            not owner
+            or not owner.exists
+            or owner.to_dict().get("kyc_status") != "VERIFIED"
+        ):
+            raise ValueError(
+                "The campaign owner must be verified before donations open"
+            )
+        profile = users_collection().document(user_id).get().to_dict() or {}
+        if not profile.get("email"):
+            raise ValueError("Donor email is missing")
+
+        document = transactions_collection().document()
+        data = {
             "user_id": user_id,
             "campaign_id": request.campaign_id,
-            "amount": request.amount,
+            "amount": float(request.amount),
             "currency": request.currency,
             "payment_method": request.payment_method.value,
-            "status": TransactionStatus.PENDING.value,
-            "created_at": datetime.utcnow().isoformat()
+            "status": "PENDING",
+            "created_at": now(),
         }
-        
-        # Save to Firestore
-        doc_ref = transactions_collection().add(transaction_data)
-        transaction_id = doc_ref[1].id
-        
-        # Create gateway session
-        session = await self.gateway.create_session(
-            amount=request.amount,
-            currency=request.currency,
-            reference=transaction_id,
-            return_url=request.return_url or "http://localhost:5500/payment-complete.html"
-        )
-        
-        # Update transaction with session info
-        transactions_collection().document(transaction_id).update({
-            "gateway_session_id": session["session_id"],
-            "status": TransactionStatus.PROCESSING.value
-        })
-        
-        # Audit log
-        log_audit_event(
-            action="PAYMENT_INITIATED",
-            user_id=user_id,
-            details={
-                "transaction_id": transaction_id,
-                "campaign_id": request.campaign_id,
-                "amount": request.amount
-            }
-        )
-        
-        return PaymentSessionResponse(
-            transaction_id=transaction_id,
-            session_id=session["session_id"],
-            checkout_url=session["checkout_url"],
-            amount=request.amount,
-            currency=request.currency,
-            status=TransactionStatus.PROCESSING.value,
-            expires_at=session.get("expires_at")
-        )
-    
-    async def confirm_payment(
-        self,
-        request: ConfirmPaymentRequest
-    ) -> TransactionResponse:
-        """
-        Confirm payment (webhook/callback from gateway).
-        
-        1. Verify with gateway
-        2. Update transaction status
-        3. Update campaign raised amount
-        """
-        doc_ref = transactions_collection().document(request.transaction_id)
-        doc = doc_ref.get()
-        
-        if not doc.exists:
-            raise ValueError("Transaction not found")
-        
-        transaction_data = doc.to_dict()
-        
-        # Update transaction
-        update_data = {
-            "status": request.status.value,
-            "gateway_reference": request.gateway_reference,
-            "updated_at": datetime.utcnow().isoformat()
-        }
-        
-        if request.status == TransactionStatus.COMPLETED:
-            update_data["completed_at"] = datetime.utcnow().isoformat()
-            
-            # Update campaign raised amount
-            from app.services.campaign_service import campaign_service
-            await campaign_service.update_raised_amount(
-                campaign_id=transaction_data["campaign_id"],
-                amount=transaction_data["amount"]
+        document.set(data)
+        try:
+            session = await self.gateway.create_session(
+                request.amount,
+                request.currency,
+                document.id,
+                profile["email"],
             )
-        
-        doc_ref.update(update_data)
-        
-        # Audit log
-        log_audit_event(
-            action="PAYMENT_CONFIRMED",
-            user_id=transaction_data["user_id"],
-            details={
-                "transaction_id": request.transaction_id,
-                "status": request.status.value
-            }
+        except Exception:
+            document.update({"status": "FAILED", "updated_at": now()})
+            raise
+        document.update(
+            {"gateway_session_id": session["session_id"], "status": "PROCESSING"}
         )
-        
-        # Get updated transaction
-        return await self.get_transaction(request.transaction_id)
-    
-    async def get_transaction(self, transaction_id: str) -> TransactionResponse:
-        """Get transaction by ID."""
-        doc = transactions_collection().document(transaction_id).get()
-        
-        if not doc.exists:
+        return PaymentSessionResponse(
+            transaction_id=document.id,
+            amount=float(request.amount),
+            currency=request.currency,
+            status="PROCESSING",
+            **session,
+        )
+
+    async def confirm_payment(self, request):
+        document = transactions_collection().document(request.transaction_id)
+        snapshot = document.get()
+        if not snapshot.exists:
             raise ValueError("Transaction not found")
-        
-        data = doc.to_dict()
+        receipt = await self.gateway.verify_payment(request.gateway_reference)
+        validate_receipt(receipt, snapshot.to_dict(), document.id)
+        if str(receipt.get("id")) != request.gateway_reference:
+            raise ValueError("Provider transaction ID does not match")
+
+        campaign = campaigns_collection().document(snapshot.to_dict()["campaign_id"])
+        receipt_ref = (
+            get_firestore()
+            .collection("payment_receipts")
+            .document(request.gateway_reference)
+        )
+
+        @firestore.transactional
+        def credit_once(transaction):
+            donation = document.get(transaction=transaction).to_dict()
+            prior_receipt = receipt_ref.get(transaction=transaction)
+            campaign_snapshot = campaign.get(transaction=transaction)
+            validate_receipt(receipt, donation, document.id)
+            if donation["status"] == "COMPLETED":
+                if donation.get("gateway_reference") != request.gateway_reference:
+                    raise ValueError("Donation already has a different receipt")
+                return
+            if prior_receipt.exists:
+                raise ValueError("This receipt was already used")
+            if not campaign_snapshot.exists:
+                raise ValueError("Campaign not found")
+            campaign_data = campaign_snapshot.to_dict()
+            if campaign_data.get("currency", "KES") != donation["currency"]:
+                raise ValueError("Campaign currency changed")
+            raised = Decimal(str(campaign_data.get("raised_amount", 0)))
+            raised += Decimal(str(donation["amount"]))
+            transaction.update(
+                campaign, {"raised_amount": float(raised), "updated_at": now()}
+            )
+            transaction.update(
+                document,
+                {
+                    "status": "COMPLETED",
+                    "gateway_reference": request.gateway_reference,
+                    "completed_at": now(),
+                    "updated_at": now(),
+                },
+            )
+            transaction.set(
+                receipt_ref, {"transaction_id": document.id, "created_at": now()}
+            )
+
+        credit_once(get_firestore().transaction())
+        return await self.get_transaction(document.id)
+
+    async def get_transaction(self, transaction_id):
+        document = transactions_collection().document(transaction_id).get()
+        if not document.exists:
+            raise ValueError("Transaction not found")
+        return self.response(document.id, document.to_dict())
+
+    @staticmethod
+    def response(transaction_id, data):
         return TransactionResponse(
             transaction_id=transaction_id,
-            user_id=data.get("user_id", ""),
-            campaign_id=data.get("campaign_id", ""),
-            amount=data.get("amount", 0),
-            currency=data.get("currency", "USD"),
-            status=data.get("status", ""),
-            payment_method=data.get("payment_method", ""),
-            created_at=data.get("created_at", ""),
-            completed_at=data.get("completed_at")
+            **{
+                key: data.get(key)
+                for key in TransactionResponse.model_fields
+                if key != "transaction_id"
+            },
         )
-    
-    async def get_user_transactions(
-        self, 
-        user_id: str,
-        limit: int = 50
-    ) -> list[TransactionResponse]:
-        """Get all transactions for a user."""
-        query = transactions_collection().where("user_id", "==", user_id).limit(limit)
-        docs = query.stream()
-        
-        transactions = []
-        for doc in docs:
-            data = doc.to_dict()
-            transactions.append(TransactionResponse(
-                transaction_id=doc.id,
-                user_id=data.get("user_id", ""),
-                campaign_id=data.get("campaign_id", ""),
-                amount=data.get("amount", 0),
-                currency=data.get("currency", "USD"),
-                status=data.get("status", ""),
-                payment_method=data.get("payment_method", ""),
-                created_at=data.get("created_at", ""),
-                completed_at=data.get("completed_at")
-            ))
-        
-        return transactions
+
+    async def get_user_transactions(self, user_id, limit=50):
+        documents = (
+            transactions_collection()
+            .where("user_id", "==", user_id)
+            .limit(limit)
+            .stream()
+        )
+        return [
+            self.response(document.id, document.to_dict()) for document in documents
+        ]
 
 
-# Singleton instance
 payment_service = PaymentService()

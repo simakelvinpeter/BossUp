@@ -1,0 +1,10 @@
+.git
+.venv
+.env
+**/.env
+**/__pycache__
+**/*firebase*json
+**/.pytest_cache
+backend/tests
+tests
+sources
